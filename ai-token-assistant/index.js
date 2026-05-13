@@ -2,12 +2,12 @@ import express from "express"
 import mongoose from "mongoose"
 import cors from "cors"
 import dotenv from "dotenv"
-import userRoutes from './routes/user'
+import userRoutes from "./routes/user.js"
 import {serve} from "inngest/express"
-import tokenRoutes from './routes/token'
-import { inngest } from "./inngest/client"
-import {onUserSignup} from "./inngest/functions/onsignup"
-import {onTokenCreated} from "./inngest/functions/ont-token-create"
+import tokenRoutes from "./routes/token.js"
+import { inngest } from "./inngest/client.js"
+import {onUserSignup} from "./inngest/functions/onsignup.js"
+import {onTokenCreated} from "./inngest/functions/ont-token-create.js"
 dotenv.config()
 
 const PORT = process.env.PORT || 3000

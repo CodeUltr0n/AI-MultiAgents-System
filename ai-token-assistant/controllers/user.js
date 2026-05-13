@@ -1,8 +1,7 @@
 import bcrypt from "bcrypt"
-import jwt, { decode } from 'jsonwebtoken'
-import User from '../models/user'
-import {inngest} from '../inngest/client'
-import user from "../models/user"
+import jwt from 'jsonwebtoken'
+import User from '../models/user.js'
+import {inngest} from '../inngest/client.js'
 
 
 export const signup = async (req,res) => {
@@ -32,7 +31,7 @@ export const signup = async (req,res) => {
     });
 
     const token = jwt.sign(
-        {_id: user._id,role:user.role._id},
+        {_id: user._id, role: user.role},
         process.env.JWT_SECRET
     )
 
@@ -49,7 +48,7 @@ export const login = async (req,res) => {
     const {email,password} = req.body
 
     try {
-        const user = User.findOne({email})
+        const user = await User.findOne({email})
         if(!user) return res.status(401).json({error:"user not found"})
 
            const isMatch = await bcrypt.compare(password,user.password)
@@ -57,6 +56,13 @@ export const login = async (req,res) => {
            if(!isMatch){
              return res.status(401).json({error:"invalid credentials"})
            }
+
+        const token = jwt.sign(
+            {_id: user._id, role: user.role},
+            process.env.JWT_SECRET
+        )
+
+        return res.json({ user, token })
     } catch (error) {
          res.status(500).json({ error:'Login failed',
          details: error.message,
@@ -70,11 +76,11 @@ export const logout = async (req,res) => {
        const token = req.headers.authorization.split(" ")[1]
        if(!token){
         return res.status(401).json({error:"Unauthorized"})
-        jwt.verify(token,process.env.JWT_SECRET,(err,decoded) => {
-            if(err) return res.status(401).json({error:"Unauthorized"})
-                res.json({message:"Logout successfully"})
-        })
        }
+       jwt.verify(token,process.env.JWT_SECRET,(err) => {
+            if(err) return res.status(401).json({error:"Unauthorized"})
+            return res.json({message:"Logout successfully"})
+       })
     } catch (error) {
         res.status(500).json({ error:'Logout failed',
         details: error.message,

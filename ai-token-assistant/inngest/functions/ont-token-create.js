@@ -1,14 +1,13 @@
-import { inngest } from "../client";
-import Token from '../../models/token'
+import { inngest } from "../client.js";
+import Token from '../../models/token.js'
 import { NonRetriableError } from "inngest";
-import { sendMail } from "../../utils/mailer";
-import analyizeToken from "../../utils/Ai";
-import User from '../../models/user'
+import { sendMail } from "../../utils/mailer.js";
+import analyizeToken from "../../utils/Ai.js";
+import User from '../../models/user.js'
 
 
 export const onTokenCreated = inngest.createFunction(
-    {id : 'on-token-created',retries:2},
-    {event:"token/created"},
+    {id : 'on-token-created', retries: 2, triggers: { event: "token/created" }},
 
     async ({event,step}) =>{
         try {
@@ -17,7 +16,7 @@ export const onTokenCreated = inngest.createFunction(
             /// fetching token from db
            const token = await step.run("fetch-token",async ()=> {
             const tokenObject = await Token.findById(tokenId);
-            if(!token){
+            if(!tokenObject){
                 throw new NonRetriableError("Token not found");
             }
             return tokenObject
@@ -32,10 +31,10 @@ export const onTokenCreated = inngest.createFunction(
         const relatedskills = await step.run("ai-processing",async ()=>{
             let skills = []
             if(aiResponse){
-                await token.findByIdAndUpdate(token._id,{
-                    priority:!["low","medium","high"]
+                await Token.findByIdAndUpdate(token._id,{
+                    priority: !["low","medium","high"]
                     .includes(aiResponse.priority) ? "medium" : aiResponse.priority,
-                    helpfulNotes: aiResponse,
+                    helpfulNotes: aiResponse.helpfulNotes,
                     status:"IN_PROGRESS",
                     relatedSkills:aiResponse.relatedSkills
                 })
@@ -81,7 +80,7 @@ export const onTokenCreated = inngest.createFunction(
         );
         return { success: true };
         } catch (error) {
-            console.error("Error running the step",err.message);
+            console.error("Error running the step", error.message);
             return { success : false}
         }
     }

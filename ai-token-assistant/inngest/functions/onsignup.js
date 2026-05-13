@@ -1,14 +1,13 @@
-import { inngest } from "../client";
-import User from '../../models/user'
+import { inngest } from "../client.js";
+import User from '../../models/user.js'
 import { NonRetriableError } from "inngest";
-import { sendMail } from "../../utils/mailer";
+import { sendMail } from "../../utils/mailer.js";
 
 export const onUserSignup = inngest.createFunction(
-    {id : 'on-user-signup',retries:2},
-    {event:"user/signup"},
+    {id : 'on-user-signup', retries: 2, triggers: { event: "user/signup" }},
     async ({event,step}) => {
     try {
-        const {event} = event.data
+        const { email } = event.data
         const user = await step.run("get-user-email",async()=>{
             const userObject = await User.findOne({email})
             if(!userObject){

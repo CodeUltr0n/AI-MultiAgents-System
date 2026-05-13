@@ -1,7 +1,6 @@
 import express from 'express'
-import {authenticate} from '../inngest/middlewares/auth'
-import { getUsers, login, logout, signup, updateUser } from '../inngest/controllers/user'
-import { createToken, getToken, getTokens } from '../controllers/token'
+import {authenticate} from '../middlewares/auth.js'
+import { createToken, getToken, getTokens } from '../controllers/token.js'
 
 
 const router = express.Router()

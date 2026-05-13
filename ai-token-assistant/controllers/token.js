@@ -1,13 +1,13 @@
-import {inngest} from '../inngest/client'
-import Token from '../models/token'
+import {inngest} from '../inngest/client.js'
+import Token from '../models/token.js'
 
 export const createToken = async(req,res)=>{
     try {
         const {title,description} = req.body
-        if (!title || description) {
-            res.status(401).json({message:"Title and description are required"})
+        if (!title || !description) {
+            return res.status(400).json({message:"Title and description are required"})
         }
-        const newToken = Token.create({
+        const newToken = await Token.create({
             title,
             description,
             createdBy:req.user._id.toString()
@@ -16,7 +16,7 @@ export const createToken = async(req,res)=>{
         await inngest.send({
             name:"token/created",
             data:{
-                tokenId:(await newToken)._id.toString(),
+                tokenId:newToken._id.toString(),
                 title,
                 description,
                 createdBy:req.user._id.toString()
@@ -37,11 +37,11 @@ export const getTokens = async (req,res) => {
         const user = req.user
         let tokens = []
         if(user.role !== "user"){
-            tokens = Token.find({}).populate("assignedTo",
+            tokens = await Token.find({}).populate("assignedTo",
                 ["email","_id"]
             ).sort({createdAt:-1})
         }else{
-            await Token.find({createdBy:user._id})
+            tokens = await Token.find({createdBy:user._id})
             .select("title description status createdAt")
             .sort({createdAt:-1})
         }
@@ -58,11 +58,11 @@ export const getToken = async (req,res) => {
         let token;
 
         if(user.role !== "user"){
-            token = Token.findById(req.params.id).populate("assignedTo",
+            token = await Token.findById(req.params.id).populate("assignedTo",
             ["email","_id"]
           )
         }else{
-            token = Token.findOne({
+            token = await Token.findOne({
                 createdBy:user._id,
                 _id:req.params.id
             }).select("title description status createdAt")
@@ -78,4 +78,3 @@ export const getToken = async (req,res) => {
         return res.status(500).json({message:"Internal Server error"})
     }
 }
-
