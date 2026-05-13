@@ -4,7 +4,10 @@ import './index.css'
 import {BrowserRouter,Routes,Route} from 'react-router-dom'
 import Checkauth from './components/checkauth.jsx'
 import Tokens from './pages/tokens.jsx'
-import Tokendetails from './pages/token'
+import Tokendetails from './pages/token.jsx'
+import Login from './pages/login.jsx'
+import Signup from './pages/Signup.jsx'
+import Admin from './pages/admin.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -26,6 +29,32 @@ createRoot(document.getElementById('root')).render(
         </Checkauth>
        }
        />
+       <Route 
+       path='/login'
+       element={
+        <Checkauth protected={false}>
+          <Login />
+        </Checkauth>
+       }
+       />
+       <Route 
+       path='/signup'
+       element={
+        <Checkauth protected={false}>
+          <Signup />
+        </Checkauth>
+       }
+       />
+
+       <Route 
+       path='/admin'
+       element={
+        <Checkauth protected={true}>
+          <Admin />
+        </Checkauth>
+       }
+       />
+
     </Routes>
     </BrowserRouter>
   </StrictMode>,
