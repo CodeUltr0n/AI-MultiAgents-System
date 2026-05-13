@@ -11,9 +11,9 @@ const tokenSchema = new mongoose.Schema({
         default:null
     },
 
-    Priority:String,
+    priority:String,
+    helpfulNotes:String,
     Deadline:Date,
-    helpfullNotes:String,
     relatedSkills:[String],
     createdAt:{type:Date,default:Date.now}
 })

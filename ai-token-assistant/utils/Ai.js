@@ -3,7 +3,7 @@ import {createAgent,gemini} from '@inngest/agent-kit'
 const analyizeToken = async (token) => {
     const supportAgent = createAgent({
         model:gemini({
-            model:"gemini-1.5-flash-8b",
+            model:"gemini-2.5-flash",
             apiKey:process.env.GEMINI_API_KEY,
         }),
         name:"AI Token Triage Assistant",
@@ -48,7 +48,7 @@ Token information:
 - Title: ${token.title}
 - Description: ${token.description}`);
 
-const raw = response.output[0].context
+const raw = response.output[0].content;
 
 try {
     const match = raw.match(/```json\s*([\s\S]*?)\s*```/i);

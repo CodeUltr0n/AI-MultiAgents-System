@@ -42,7 +42,7 @@ export const getTokens = async (req,res) => {
             ).sort({createdAt:-1})
         }else{
             tokens = await Token.find({createdBy:user._id})
-            .select("title description status createdAt")
+            .select("title description status createdAt helpfulNotes priority relatedSkills")
             .sort({createdAt:-1})
         }
         return res.status(200).json(tokens)
@@ -65,7 +65,7 @@ export const getToken = async (req,res) => {
             token = await Token.findOne({
                 createdBy:user._id,
                 _id:req.params.id
-            }).select("title description status createdAt")
+            }).select("title description status createdAt helpfulNotes priority relatedSkills")
         }
 
         if(!token){

@@ -7,8 +7,7 @@ import User from '../../models/user.js'
 
 
 export const onTokenCreated = inngest.createFunction(
-    {id : 'on-token-created', retries: 2, triggers: { event: "token/created" }},
-
+    {id : 'on-token-created', retries: 2, triggers: [{ event: "token/created" }]},
     async ({event,step}) =>{
         try {
             const {tokenId} = event.data;
@@ -45,19 +44,21 @@ export const onTokenCreated = inngest.createFunction(
 
         const moderator = await step.run("assign-moderator",
             async () => {
-                let user = await User.findOne({
-                    role:"moderator",
-                    skills:{
-                        $elemMatch:{
-                            $regex:relatedskills.join("|"),
-                            $options:"i"
-                        },
-                    },
-                });
-                if(!user){
+                let user = null;
+                console.log("AI Extracted Skills:", relatedskills);
+                
+                if (relatedskills && relatedskills.length > 0) {
                     user = await User.findOne({
-                        role:"admin"
-                    })
+                        role: "moderator",
+                        skills: { $in: relatedskills }
+                    }).lean();
+                }
+                
+                if (!user) {
+                    console.log("No moderator found, falling back to Admin");
+                    user = await User.findOne({
+                        role: "admin"
+                    }).lean();
                 }
                 await Token.findByIdAndUpdate(token._id,{
                     assignedTo:user?._id || null
