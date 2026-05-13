@@ -1,8 +1,8 @@
 import bcrypt from "bcrypt"
 import jwt, { decode } from 'jsonwebtoken'
-import User from '../../models/user'
-import {inngest} from '../client'
-import user from "../../models/user"
+import User from '../models/user'
+import {inngest} from '../inngest/client'
+import user from "../models/user"
 
 
 export const signup = async (req,res) => {
